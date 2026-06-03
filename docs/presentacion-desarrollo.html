@@ -1,0 +1,805 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OLLIN Pulse - Presentacion general del desarrollo</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #17202a;
+        --muted: #667085;
+        --paper: #f6f8fb;
+        --panel: #ffffff;
+        --line: #d9deea;
+        --brand: #136f63;
+        --brand-soft: #dff4ef;
+        --gold: #d9991f;
+        --gold-soft: #fff1d6;
+        --red: #c43b48;
+        --red-soft: #ffe2e6;
+        --blue: #2d6cdf;
+        --blue-soft: #e5efff;
+        --dark: #101824;
+        --shadow: 0 18px 45px rgba(22, 30, 46, 0.1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.55;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 290px minmax(0, 1fr);
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        padding: 28px 22px;
+        background: var(--dark);
+        color: #f6f8fb;
+        overflow-y: auto;
+      }
+
+      .brand {
+        display: grid;
+        gap: 6px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+      }
+
+      .brand strong {
+        font-size: 1.25rem;
+        letter-spacing: 0;
+      }
+
+      .brand span {
+        color: #b8c2d6;
+        font-size: 0.9rem;
+      }
+
+      .nav {
+        display: grid;
+        gap: 8px;
+        margin-top: 22px;
+      }
+
+      .nav a {
+        border-radius: 8px;
+        color: #dbe3f4;
+        padding: 9px 10px;
+        text-decoration: none;
+      }
+
+      .nav a:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+      }
+
+      main {
+        width: min(1180px, 100%);
+        padding: 34px;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 430px;
+        gap: 28px;
+        align-items: center;
+        margin-bottom: 24px;
+        padding: 34px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        color: var(--brand);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3 {
+        line-height: 1.16;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        max-width: 720px;
+        margin: 0;
+        font-size: clamp(2rem, 4.8vw, 3.8rem);
+      }
+
+      h2 {
+        margin: 0 0 14px;
+        font-size: 1.75rem;
+      }
+
+      h3 {
+        margin: 22px 0 10px;
+        font-size: 1.08rem;
+      }
+
+      p {
+        margin: 0 0 14px;
+      }
+
+      .lead {
+        max-width: 760px;
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 1.08rem;
+      }
+
+      section {
+        margin: 24px 0;
+        padding: 28px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+      }
+
+      .section-head {
+        display: flex;
+        gap: 18px;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 18px;
+      }
+
+      .section-head p {
+        max-width: 720px;
+        color: var(--muted);
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        padding: 4px 9px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .grid-2,
+      .grid-3,
+      .metric-grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .grid-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .grid-3,
+      .metric-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .metric {
+        min-height: 126px;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfcff;
+      }
+
+      .metric strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 1.05rem;
+      }
+
+      .metric span {
+        color: var(--muted);
+      }
+
+      .note,
+      .tip,
+      .warning {
+        padding: 14px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+      }
+
+      .note {
+        background: var(--blue-soft);
+        color: #1c4e9a;
+      }
+
+      .tip {
+        background: var(--brand-soft);
+        color: #15564e;
+      }
+
+      .warning {
+        background: var(--red-soft);
+        color: #8b2633;
+      }
+
+      .steps {
+        display: grid;
+        gap: 10px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .steps li {
+        display: grid;
+        grid-template-columns: 34px minmax(0, 1fr);
+        gap: 12px;
+        align-items: start;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfcff;
+      }
+
+      .steps span {
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: var(--brand);
+        color: #fff;
+        font-weight: 800;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      th,
+      td {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: #eef2f7;
+        font-size: 0.82rem;
+        text-transform: uppercase;
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      code {
+        padding: 1px 5px;
+        border: 1px solid #cfd6e3;
+        border-bottom-width: 2px;
+        border-radius: 6px;
+        background: #f4f6fa;
+        color: #293548;
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        font-size: 0.92em;
+      }
+
+      .showcase {
+        border: 1px solid #bdc7d8;
+        border-radius: 8px;
+        background: #17202d;
+        padding: 12px;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+      }
+
+      .window-bar {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        height: 22px;
+        margin-bottom: 10px;
+        color: #c7d2e5;
+        font-size: 0.76rem;
+        font-weight: 700;
+      }
+
+      .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #ff6b6b;
+      }
+
+      .dot:nth-child(2) {
+        background: #ffd166;
+      }
+
+      .dot:nth-child(3) {
+        background: #57cc99;
+        margin-right: 7px;
+      }
+
+      .public-stage {
+        display: grid;
+        gap: 18px;
+        min-height: 285px;
+        padding: 24px;
+        border-radius: 8px;
+        background:
+          linear-gradient(120deg, rgba(19, 111, 99, 0.9), rgba(25, 34, 48, 0.96)),
+          #17202d;
+        color: #fff;
+      }
+
+      .score-row {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 14px;
+        align-items: center;
+      }
+
+      .team-score,
+      .bank {
+        padding: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.09);
+      }
+
+      .bank {
+        min-width: 96px;
+        text-align: center;
+      }
+
+      .question-title {
+        padding: 14px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.12);
+        font-size: 1.05rem;
+        font-weight: 800;
+        text-align: center;
+      }
+
+      .public-answers {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .public-answer {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.16);
+      }
+
+      .flow {
+        display: grid;
+        grid-template-columns: repeat(8, minmax(120px, 1fr));
+        gap: 10px;
+      }
+
+      .flow-card {
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfcff;
+      }
+
+      .flow-card strong {
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      .flow-card span {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .print-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 22px;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        min-height: 40px;
+        border: 0;
+        border-radius: 8px;
+        padding: 10px 14px;
+        background: var(--brand);
+        color: #fff;
+        font: inherit;
+        font-weight: 800;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .button.secondary {
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--ink);
+      }
+
+      @media (max-width: 980px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          position: static;
+          height: auto;
+        }
+
+        .nav {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        main {
+          padding: 18px;
+        }
+
+        .hero,
+        .grid-2,
+        .grid-3,
+        .metric-grid,
+        .flow {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media print {
+        body {
+          background: #fff;
+        }
+
+        .layout {
+          display: block;
+        }
+
+        .sidebar,
+        .print-actions {
+          display: none;
+        }
+
+        main {
+          width: 100%;
+          padding: 0;
+        }
+
+        section,
+        .hero {
+          box-shadow: none;
+          break-inside: avoid;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="brand">
+          <strong>OLLIN Pulse</strong>
+          <span>Presentacion general</span>
+        </div>
+        <nav class="nav" aria-label="Indice">
+          <a href="#vision">Vision</a>
+          <a href="#objetivo">Objetivo</a>
+          <a href="#roles">Roles</a>
+          <a href="#componentes">Componentes</a>
+          <a href="#flujo">Flujo</a>
+          <a href="#formatos">Formatos</a>
+          <a href="#experiencia">Experiencia</a>
+          <a href="#tecnico">Tecnico</a>
+          <a href="#valor">Valor</a>
+          <a href="#alcance">Alcance</a>
+        </nav>
+      </aside>
+
+      <main>
+        <header class="hero">
+          <div>
+            <p class="eyebrow">Documento para interesados en el desarrollo</p>
+            <h1>Presentacion general de OLLIN Pulse</h1>
+            <p class="lead">
+              Vision ejecutiva y tecnica de la aplicacion de trivia interactiva por equipos:
+              que resuelve, como se opera, que componentes incluye y que valor aporta a una
+              activacion en vivo.
+            </p>
+            <div class="print-actions">
+              <button class="button" type="button" onclick="window.print()">Imprimir o guardar PDF</button>
+              <a class="button secondary" href="presentacion-desarrollo.md">Ver version Markdown</a>
+              <a class="button secondary" href="guia-operador.html">Ver guia de operador</a>
+            </div>
+          </div>
+
+          <div class="showcase" aria-label="Ilustracion de pantalla publica">
+            <div class="window-bar">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              Pantalla Publica
+            </div>
+            <div class="public-stage">
+              <div class="score-row">
+                <div class="team-score"><strong>Equipo A</strong><br />120 pts</div>
+                <div class="bank"><strong>Bolsa</strong><br />45</div>
+                <div class="team-score"><strong>Equipo B</strong><br />80 pts</div>
+              </div>
+              <div class="question-title">Menciona algo que no puede faltar en un evento</div>
+              <div class="public-answers">
+                <div class="public-answer"><span>Musica</span><b>32</b></div>
+                <div class="public-answer"><span>Comida</span><b>24</b></div>
+                <div class="public-answer"><span>Bebidas</span><b>16</b></div>
+                <div class="public-answer"><span>Invitados</span><b>10</b></div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <section id="vision">
+          <div class="section-head">
+            <div>
+              <h2>1. Vision general</h2>
+              <p>OLLIN Pulse convierte una dinamica de trivia en una experiencia visual controlada, repetible y lista para evento.</p>
+            </div>
+            <span class="tag">Producto</span>
+          </div>
+
+          <div class="metric-grid">
+            <div class="metric"><strong>Operacion centralizada</strong><span>Preguntas, escenas, marcador, errores y cierre de ronda desde una sola ventana.</span></div>
+            <div class="metric"><strong>Salida publica limpia</strong><span>La audiencia ve solo la presentacion: tablero, marcador, efectos y ganador.</span></div>
+            <div class="metric"><strong>Contenido configurable</strong><span>Las preguntas se preparan en CSV/XLSX y se cargan sin modificar codigo.</span></div>
+            <div class="metric"><strong>Reglas automatizadas</strong><span>Puntos, multiplicadores, bolsa, errores y ganador se mantienen sincronizados.</span></div>
+            <div class="metric"><strong>Formato adaptable</strong><span>Soporta partidas de 3 rondas, 5 rondas y muerte subita.</span></div>
+            <div class="metric"><strong>Base extensible</strong><span>Arquitectura separada para evolucionar visuales, reglas y futuras mecanicas.</span></div>
+          </div>
+        </section>
+
+        <section id="objetivo">
+          <div class="section-head">
+            <div>
+              <h2>2. Objetivo de la activacion</h2>
+              <p>La app esta pensada para facilitar una trivia por equipos con ritmo de escenario y control de produccion.</p>
+            </div>
+            <span class="tag">Activacion</span>
+          </div>
+
+          <div class="grid-2">
+            <div class="tip">
+              OLLIN Pulse ayuda a que produccion se concentre en la conduccion del evento,
+              mientras el sistema mantiene sincronizados marcador, rondas, escenas y efectos visuales.
+            </div>
+            <div>
+              <ul>
+                <li>Generar participacion mediante competencia directa entre dos equipos.</li>
+                <li>Mantener tension progresiva con multiplicadores por ronda.</li>
+                <li>Reducir errores manuales durante una operacion en vivo.</li>
+                <li>Permitir ensayos y cambios de contenido sin tocar codigo.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="roles">
+          <div class="section-head">
+            <div>
+              <h2>3. Participantes y roles</h2>
+              <p>La dinamica separa claramente operacion, conduccion, competencia y audiencia.</p>
+            </div>
+            <span class="tag">Roles</span>
+          </div>
+
+          <table>
+            <tr><th>Rol</th><th>Funcion dentro de la dinamica</th></tr>
+            <tr><td>Operador</td><td>Controla la aplicacion, carga preguntas, avanza escenas, revela respuestas y asigna puntos.</td></tr>
+            <tr><td>Conductor</td><td>Presenta la trivia, da la palabra a los equipos y mantiene el ritmo del evento.</td></tr>
+            <tr><td>Equipo A / Equipo B</td><td>Compiten respondiendo preguntas y acumulando puntos.</td></tr>
+            <tr><td>Audiencia</td><td>Sigue la dinamica en la pantalla publica.</td></tr>
+            <tr><td>Produccion</td><td>Prepara contenido, valida pantallas, coordina tiempos y supervisa la ejecucion.</td></tr>
+          </table>
+        </section>
+
+        <section id="componentes">
+          <div class="section-head">
+            <div>
+              <h2>4. Componentes principales</h2>
+              <p>El desarrollo separa control privado, salida publica, reglas de juego y administracion de escenas.</p>
+            </div>
+            <span class="tag">Sistema</span>
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <h3>Ventana de operador</h3>
+              <p>Centro de control para modo de juego, equipos, preguntas, preview, escenas, respuestas, errores y bolsa.</p>
+              <div class="note">Incluye preview de la pantalla publica para evitar sorpresas en salida.</div>
+            </div>
+            <div>
+              <h3>Pantalla publica</h3>
+              <p>Salida visual para proyector, pantalla LED o segundo monitor. Muestra intro, ronda, tablero, marcador, robo, resultado y ganador.</p>
+              <div class="tip">La pantalla publica no expone controles internos ni datos de operacion.</div>
+            </div>
+            <div>
+              <h3>Motor de juego</h3>
+              <p>Mantiene equipos, puntuaciones, rondas, multiplicadores, preguntas, bolsa, errores y ganador.</p>
+            </div>
+            <div>
+              <h3>Administrador de escenas</h3>
+              <p>Controla escena activa, escena previa, cola, timeline y overlays temporales como X o robo de puntos.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="flujo">
+          <div class="section-head">
+            <div>
+              <h2>5. Flujo de la dinamica</h2>
+              <p>El flujo retoma la estructura de una trivia interactiva: preparacion, rondas, errores, robo y cierre.</p>
+            </div>
+            <span class="tag">Ritmo</span>
+          </div>
+
+          <div class="flow">
+            <div class="flow-card"><strong>1. Preparacion</strong><span>Ventanas, modo, equipos y preguntas.</span></div>
+            <div class="flow-card"><strong>2. Inicio</strong><span>Intro visual de la trivia.</span></div>
+            <div class="flow-card"><strong>3. Ronda</strong><span>Numero de ronda y multiplicador.</span></div>
+            <div class="flow-card"><strong>4. Pregunta</strong><span>Tablero y respuestas ocultas.</span></div>
+            <div class="flow-card"><strong>5. Desarrollo</strong><span>Revelado, bolsa y errores.</span></div>
+            <div class="flow-card"><strong>6. Robo</strong><span>Aviso visual y decision operativa.</span></div>
+            <div class="flow-card"><strong>7. Cierre</strong><span>Asignacion de bolsa.</span></div>
+            <div class="flow-card"><strong>8. Final</strong><span>Marcador y ganador.</span></div>
+          </div>
+        </section>
+
+        <section id="formatos">
+          <div class="section-head">
+            <div>
+              <h2>6. Duracion y formatos</h2>
+              <p>Los modos permiten ajustar la dinamica al tiempo disponible y al tipo de evento.</p>
+            </div>
+            <span class="tag">Modos</span>
+          </div>
+
+          <table>
+            <tr><th>Modo</th><th>Uso recomendado</th><th>Multiplicadores</th></tr>
+            <tr><td>3 rondas</td><td>Activacion breve, dinamica de alto ritmo o agenda con tiempo limitado.</td><td>R1 x1, R2 x2, R3 x3.</td></tr>
+            <tr><td>5 rondas</td><td>Experiencia extendida con mas oportunidades de remontada.</td><td>R1-R2 x1, R3-R4 x2, R5 x3.</td></tr>
+            <tr><td>Muerte subita</td><td>Desempate o mecanica rapida de cierre.</td><td>Una ronda x1.</td></tr>
+          </table>
+        </section>
+
+        <section id="experiencia">
+          <div class="section-head">
+            <div>
+              <h2>7. Elementos de experiencia</h2>
+              <p>La app esta disenada para sentirse como una pieza de escenario, no como una hoja de calculo proyectada.</p>
+            </div>
+            <span class="tag">Pantalla</span>
+          </div>
+
+          <div class="grid-3">
+            <div class="metric"><strong>Tablero televisivo</strong><span>Respuestas ocultas que se revelan con puntos visibles.</span></div>
+            <div class="metric"><strong>Estados visuales</strong><span>Intro, ronda, pregunta, marcador, resultado y ganador final.</span></div>
+            <div class="metric"><strong>Overlays</strong><span>X visual y aviso de robo para momentos de tension.</span></div>
+            <div class="metric"><strong>Marcador legible</strong><span>Puntajes, bolsa y errores visibles para la audiencia.</span></div>
+            <div class="metric"><strong>Preview</strong><span>El operador valida lo que esta saliendo sin depender del monitor publico.</span></div>
+            <div class="metric"><strong>Atajos</strong><span>Controles de teclado para operar con mayor velocidad.</span></div>
+          </div>
+        </section>
+
+        <section id="tecnico">
+          <div class="section-head">
+            <div>
+              <h2>8. Enfoque tecnico</h2>
+              <p>La aplicacion esta construida como app de escritorio con Electron, Vue 3, Pinia y TypeScript.</p>
+            </div>
+            <span class="tag">Arquitectura</span>
+          </div>
+
+          <table>
+            <tr><th>Capa</th><th>Responsabilidad</th></tr>
+            <tr><td>Electron main</td><td>Crea ventanas, coordina IPC y mantiene control de aplicacion de escritorio.</td></tr>
+            <tr><td>WindowManager</td><td>Abre operador y pantalla publica, detectando monitor externo cuando existe.</td></tr>
+            <tr><td>GameController</td><td>Administra reglas, equipos, rondas, preguntas, puntos, errores y ganador.</td></tr>
+            <tr><td>SceneManager</td><td>Administra escenas, transiciones, overlays y timeline.</td></tr>
+            <tr><td>Vue renderer</td><td>Renderiza la interfaz de operador y la pantalla publica.</td></tr>
+            <tr><td>Pinia stores</td><td>Sincronizan estado de juego y escenas en el frontend.</td></tr>
+            <tr><td>QuestionImporter</td><td>Lee archivos CSV/XLSX y valida estructura de preguntas.</td></tr>
+          </table>
+        </section>
+
+        <section id="valor">
+          <div class="section-head">
+            <div>
+              <h2>9. Valor para interesados</h2>
+              <p>El desarrollo productiza la dinamica y reduce el riesgo operativo en vivo.</p>
+            </div>
+            <span class="tag">Impacto</span>
+          </div>
+
+          <div class="grid-2">
+            <ul class="steps">
+              <li><span>1</span><div>Menos dependencia de presentaciones manuales.</div></li>
+              <li><span>2</span><div>Menos riesgo de errores de puntaje.</div></li>
+              <li><span>3</span><div>Mayor control durante el evento.</div></li>
+            </ul>
+            <ul class="steps">
+              <li><span>4</span><div>Reutilizacion para diferentes activaciones.</div></li>
+              <li><span>5</span><div>Personalizacion de contenido sin recompilar.</div></li>
+              <li><span>6</span><div>Base tecnica para agregar identidad visual, sonidos, animaciones o nuevas mecanicas.</div></li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="alcance">
+          <div class="section-head">
+            <div>
+              <h2>10. Alcance actual y extensiones</h2>
+              <p>La base actual ya cubre operacion completa de trivia y deja espacio para nuevas etapas.</p>
+            </div>
+            <span class="tag">Roadmap</span>
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <h3>Alcance actual</h3>
+              <ul>
+                <li>Dos ventanas sincronizadas: operador y pantalla publica.</li>
+                <li>Importacion CSV/XLSX/XLS con validacion.</li>
+                <li>Modos de 3 rondas, 5 rondas y muerte subita.</li>
+                <li>Calculo automatico de puntos por multiplicador.</li>
+                <li>Revelado de respuestas, bolsa, errores, robo y ganador final.</li>
+              </ul>
+            </div>
+            <div>
+              <h3>Posibles extensiones</h3>
+              <ul>
+                <li>Personalizacion visual por marca o evento.</li>
+                <li>Sonidos, animaciones y temporizador por pregunta.</li>
+                <li>Soporte para mas de dos equipos.</li>
+                <li>Banco de preguntas administrable.</li>
+                <li>Exportacion de resultados y modo ensayo.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
