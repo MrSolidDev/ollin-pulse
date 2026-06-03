@@ -1,0 +1,999 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OLLIN Pulse - Guia de operador</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #18202c;
+        --muted: #667085;
+        --paper: #f7f8fb;
+        --panel: #ffffff;
+        --line: #d9deea;
+        --brand: #136f63;
+        --brand-soft: #dff4ef;
+        --gold: #d9991f;
+        --gold-soft: #fff1d6;
+        --danger: #c43b48;
+        --danger-soft: #ffe2e6;
+        --blue: #2d6cdf;
+        --blue-soft: #e5efff;
+        --shadow: 0 18px 45px rgba(22, 30, 46, 0.1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.55;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 280px minmax(0, 1fr);
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        padding: 28px 22px;
+        background: #101824;
+        color: #f6f8fb;
+        overflow-y: auto;
+      }
+
+      .brand {
+        display: grid;
+        gap: 6px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+      }
+
+      .brand strong {
+        font-size: 1.25rem;
+        letter-spacing: 0;
+      }
+
+      .brand span {
+        color: #b8c2d6;
+        font-size: 0.9rem;
+      }
+
+      .nav {
+        display: grid;
+        gap: 8px;
+        margin-top: 22px;
+      }
+
+      .nav a {
+        border-radius: 8px;
+        color: #dbe3f4;
+        padding: 9px 10px;
+        text-decoration: none;
+      }
+
+      .nav a:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+      }
+
+      main {
+        width: min(1180px, 100%);
+        padding: 34px;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 430px;
+        gap: 28px;
+        align-items: center;
+        margin-bottom: 24px;
+        padding: 34px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        color: var(--brand);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3 {
+        line-height: 1.16;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        max-width: 680px;
+        margin: 0;
+        font-size: clamp(2.1rem, 5vw, 4.1rem);
+      }
+
+      h2 {
+        margin: 0 0 14px;
+        font-size: 1.75rem;
+      }
+
+      h3 {
+        margin: 22px 0 10px;
+        font-size: 1.08rem;
+      }
+
+      p {
+        margin: 0 0 14px;
+      }
+
+      .lead {
+        max-width: 720px;
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 1.08rem;
+      }
+
+      section {
+        margin: 24px 0;
+        padding: 28px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+      }
+
+      .section-head {
+        display: flex;
+        gap: 18px;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 18px;
+      }
+
+      .section-head p {
+        max-width: 690px;
+        color: var(--muted);
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        padding: 4px 9px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .grid-2,
+      .grid-3 {
+        display: grid;
+        gap: 16px;
+      }
+
+      .grid-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .grid-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .note,
+      .tip,
+      .warning {
+        padding: 14px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+      }
+
+      .note {
+        background: var(--blue-soft);
+        color: #1c4e9a;
+      }
+
+      .tip {
+        background: var(--brand-soft);
+        color: #15564e;
+      }
+
+      .warning {
+        background: var(--danger-soft);
+        color: #8b2633;
+      }
+
+      .steps,
+      .checks {
+        display: grid;
+        gap: 10px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .steps li,
+      .checks li {
+        display: grid;
+        grid-template-columns: 34px minmax(0, 1fr);
+        gap: 12px;
+        align-items: start;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfcff;
+      }
+
+      .steps span,
+      .checks span {
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: var(--brand);
+        color: #fff;
+        font-weight: 800;
+      }
+
+      .checks span {
+        background: var(--gold);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      th,
+      td {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: #eef2f7;
+        font-size: 0.82rem;
+        text-transform: uppercase;
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      code,
+      kbd {
+        border: 1px solid #cfd6e3;
+        border-bottom-width: 2px;
+        border-radius: 6px;
+        background: #f4f6fa;
+        color: #293548;
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        font-size: 0.92em;
+      }
+
+      code {
+        padding: 1px 5px;
+      }
+
+      kbd {
+        display: inline-flex;
+        min-width: 30px;
+        justify-content: center;
+        padding: 3px 7px;
+        font-weight: 700;
+      }
+
+      .operator-illustration,
+      .public-illustration {
+        position: relative;
+        border: 1px solid #bdc7d8;
+        border-radius: 8px;
+        background: #17202d;
+        padding: 12px;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+      }
+
+      .window-bar {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        height: 22px;
+        margin-bottom: 10px;
+        color: #c7d2e5;
+        font-size: 0.76rem;
+        font-weight: 700;
+      }
+
+      .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #ff6b6b;
+      }
+
+      .dot:nth-child(2) {
+        background: #ffd166;
+      }
+
+      .dot:nth-child(3) {
+        background: #57cc99;
+        margin-right: 7px;
+      }
+
+      .operator-grid {
+        display: grid;
+        grid-template-columns: 0.92fr 1.25fr 0.92fr;
+        gap: 10px;
+      }
+
+      .mini-panel {
+        min-height: 72px;
+        padding: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 8px;
+        background: #222c3a;
+        color: #f7fafc;
+      }
+
+      .mini-panel strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 0.78rem;
+      }
+
+      .mini-line,
+      .mini-button {
+        height: 9px;
+        margin-top: 7px;
+        border-radius: 999px;
+        background: #435066;
+      }
+
+      .mini-button {
+        width: 62%;
+        background: var(--brand);
+      }
+
+      .mini-preview {
+        display: grid;
+        place-items: center;
+        min-height: 176px;
+        background: #111821;
+      }
+
+      .answer-stack {
+        display: grid;
+        gap: 7px;
+      }
+
+      .answer-pill {
+        display: grid;
+        grid-template-columns: 22px 1fr 34px;
+        gap: 8px;
+        align-items: center;
+        padding: 7px;
+        border-radius: 7px;
+        background: #2e3a4d;
+        font-size: 0.76rem;
+      }
+
+      .answer-pill b {
+        display: grid;
+        place-items: center;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--gold);
+        color: #1c2430;
+      }
+
+      .callout {
+        position: absolute;
+        border-radius: 999px;
+        padding: 5px 8px;
+        background: var(--gold-soft);
+        color: #66480d;
+        font-size: 0.72rem;
+        font-weight: 800;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+      }
+
+      .callout.one {
+        top: 74px;
+        left: 34px;
+      }
+
+      .callout.two {
+        top: 68px;
+        right: 150px;
+      }
+
+      .callout.three {
+        right: 28px;
+        bottom: 118px;
+      }
+
+      .callout.four {
+        left: 34px;
+        bottom: 52px;
+      }
+
+      .public-stage {
+        display: grid;
+        gap: 18px;
+        min-height: 260px;
+        padding: 24px;
+        border-radius: 8px;
+        background:
+          linear-gradient(120deg, rgba(19, 111, 99, 0.9), rgba(25, 34, 48, 0.96)),
+          #17202d;
+        color: #fff;
+      }
+
+      .score-row {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 14px;
+        align-items: center;
+      }
+
+      .team-score,
+      .bank {
+        padding: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.09);
+      }
+
+      .bank {
+        min-width: 96px;
+        text-align: center;
+      }
+
+      .question-board {
+        display: grid;
+        gap: 10px;
+      }
+
+      .question-title {
+        padding: 14px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.12);
+        font-size: 1.05rem;
+        font-weight: 800;
+        text-align: center;
+      }
+
+      .public-answers {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .public-answer {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.16);
+      }
+
+      .flow {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(120px, 1fr));
+        gap: 10px;
+      }
+
+      .flow-card {
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfcff;
+      }
+
+      .flow-card strong {
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      .flow-card span {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .kbd-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .kbd-card {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfcff;
+      }
+
+      .print-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 22px;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        min-height: 40px;
+        border: 0;
+        border-radius: 8px;
+        padding: 10px 14px;
+        background: var(--brand);
+        color: #fff;
+        font: inherit;
+        font-weight: 800;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .button.secondary {
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--ink);
+      }
+
+      @media (max-width: 980px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          position: static;
+          height: auto;
+        }
+
+        .nav {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        main {
+          padding: 18px;
+        }
+
+        .hero,
+        .grid-2,
+        .grid-3,
+        .flow,
+        .kbd-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .operator-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .callout {
+          position: static;
+          display: inline-flex;
+          margin: 6px 6px 0 0;
+        }
+      }
+
+      @media print {
+        body {
+          background: #fff;
+        }
+
+        .layout {
+          display: block;
+        }
+
+        .sidebar,
+        .print-actions {
+          display: none;
+        }
+
+        main {
+          width: 100%;
+          padding: 0;
+        }
+
+        section,
+        .hero {
+          box-shadow: none;
+          break-inside: avoid;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="brand">
+          <strong>OLLIN Pulse</strong>
+          <span>Guia visual para operador</span>
+        </div>
+        <nav class="nav" aria-label="Indice">
+          <a href="#vistas">Vistas</a>
+          <a href="#preparacion">Preparacion</a>
+          <a href="#preguntas">Preguntas</a>
+          <a href="#inicio">Inicio</a>
+          <a href="#operacion">Operacion en vivo</a>
+          <a href="#ronda">Cerrar ronda</a>
+          <a href="#atajos">Atajos</a>
+          <a href="#problemas">Problemas comunes</a>
+          <a href="#checklist">Checklist</a>
+        </nav>
+      </aside>
+
+      <main>
+        <header class="hero">
+          <div>
+            <p class="eyebrow">Documento para evento en vivo</p>
+            <h1>Guia de usuario para operador</h1>
+            <p class="lead">
+              Manual practico para preparar preguntas, controlar la pantalla publica, revelar respuestas,
+              administrar errores y cerrar rondas en OLLIN Pulse.
+            </p>
+            <div class="print-actions">
+              <button class="button" type="button" onclick="window.print()">Imprimir o guardar PDF</button>
+              <a class="button secondary" href="guia-operador.md">Ver version Markdown</a>
+            </div>
+          </div>
+
+          <div class="public-illustration" aria-label="Ilustracion de pantalla publica">
+            <div class="window-bar">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              Pantalla Publica
+            </div>
+            <div class="public-stage">
+              <div class="score-row">
+                <div class="team-score"><strong>Equipo A</strong><br />120 pts</div>
+                <div class="bank"><strong>Bolsa</strong><br />45</div>
+                <div class="team-score"><strong>Equipo B</strong><br />80 pts</div>
+              </div>
+              <div class="question-board">
+                <div class="question-title">Menciona algo que no puede faltar en un evento</div>
+                <div class="public-answers">
+                  <div class="public-answer"><span>Musica</span><b>32</b></div>
+                  <div class="public-answer"><span>Comida</span><b>24</b></div>
+                  <div class="public-answer"><span>Bebidas</span><b>16</b></div>
+                  <div class="public-answer"><span>Invitados</span><b>10</b></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <section id="vistas">
+          <div class="section-head">
+            <div>
+              <h2>1. Vistas de la app</h2>
+              <p>OLLIN Pulse trabaja con una ventana privada para control y una salida visual para el publico.</p>
+            </div>
+            <span class="tag">Mapa visual</span>
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <h3>Vista del operador</h3>
+              <p>
+                Es el panel que debe usar quien controla la dinamica. Desde aqui se cargan preguntas,
+                se eligen equipos, se avanzan escenas y se asignan puntos.
+              </p>
+              <div class="operator-illustration">
+                <div class="window-bar">
+                  <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                  OLLIN Pulse - Operador
+                </div>
+                <div class="operator-grid">
+                  <div>
+                    <div class="mini-panel"><strong>Partida</strong><div class="mini-button"></div><div class="mini-line"></div></div>
+                    <div class="mini-panel"><strong>Equipos</strong><div class="mini-line"></div><div class="mini-line"></div></div>
+                    <div class="mini-panel"><strong>Controles rapidos</strong><div class="mini-button"></div><div class="mini-line"></div></div>
+                    <div class="mini-panel"><strong>Timeline</strong><div class="mini-line"></div><div class="mini-line"></div></div>
+                  </div>
+                  <div>
+                    <div class="mini-panel mini-preview"><strong>Preview actual</strong></div>
+                    <div class="mini-panel"><strong>Preview siguiente</strong><div class="mini-line"></div><div class="mini-line"></div></div>
+                  </div>
+                  <div>
+                    <div class="mini-panel"><strong>Preguntas</strong><div class="mini-button"></div><div class="mini-line"></div></div>
+                    <div class="mini-panel">
+                      <strong>Revelar</strong>
+                      <div class="answer-stack">
+                        <div class="answer-pill"><b>1</b><span>Musica</span><strong>32</strong></div>
+                        <div class="answer-pill"><b>2</b><span>Comida</span><strong>24</strong></div>
+                        <div class="answer-pill"><b>3</b><span>Bebidas</span><strong>16</strong></div>
+                      </div>
+                    </div>
+                    <div class="mini-panel"><strong>Estado</strong><div class="mini-line"></div><div class="mini-line"></div></div>
+                  </div>
+                </div>
+                <span class="callout one">Partida y equipos</span>
+                <span class="callout two">Preview publico</span>
+                <span class="callout three">Revelar y puntos</span>
+                <span class="callout four">Timeline</span>
+              </div>
+            </div>
+
+            <div>
+              <h3>Pantalla publica</h3>
+              <p>
+                Es la ventana que se proyecta. Se actualiza automaticamente cuando el operador avanza escenas,
+                revela respuestas, muestra X, anuncia robo o finaliza la partida.
+              </p>
+              <div class="tip">
+                Usa el panel <strong>Preview actual</strong> para confirmar lo que esta saliendo antes de mirar
+                la pantalla fisica.
+              </div>
+              <h3>Paneles clave</h3>
+              <table>
+                <tr><th>Panel</th><th>Uso</th></tr>
+                <tr><td>Partida</td><td>Modo, iniciar, finalizar y reset.</td></tr>
+                <tr><td>Controles rapidos</td><td>Escenas, marcador, robo, X y errores.</td></tr>
+                <tr><td>Revelar</td><td>Mostrar respuestas y asignar bolsa.</td></tr>
+                <tr><td>Estado</td><td>Puntaje, errores y bolsa actual.</td></tr>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="preparacion">
+          <div class="section-head">
+            <div>
+              <h2>2. Preparacion antes del evento</h2>
+              <p>Haz esta revision antes de abrir puertas o iniciar la dinamica con publico.</p>
+            </div>
+            <span class="tag">Pre-show</span>
+          </div>
+
+          <ol class="steps">
+            <li><span>1</span><div>Abre OLLIN Pulse y confirma que aparezca la ventana <strong>Operador</strong>.</div></li>
+            <li><span>2</span><div>Coloca la ventana <strong>Pantalla Publica</strong> en el monitor, pantalla LED o proyector correcto.</div></li>
+            <li><span>3</span><div>En <strong>Partida</strong>, elige el modo: 3 rondas, 5 rondas o muerte subita.</div></li>
+            <li><span>4</span><div>En <strong>Equipos</strong>, escribe los nombres y presiona <strong>Guardar nombres</strong>.</div></li>
+          </ol>
+
+          <h3>Modos de juego</h3>
+          <table>
+            <tr><th>Modo</th><th>Uso recomendado</th><th>Multiplicadores</th></tr>
+            <tr><td>3 rondas</td><td>Partida corta o evento agil.</td><td>R1 x1, R2 x2, R3 x3.</td></tr>
+            <tr><td>5 rondas</td><td>Partida extendida.</td><td>R1-R2 x1, R3-R4 x2, R5 x3.</td></tr>
+            <tr><td>Muerte subita</td><td>Desempate o dinamica rapida.</td><td>Una ronda x1.</td></tr>
+          </table>
+        </section>
+
+        <section id="preguntas">
+          <div class="section-head">
+            <div>
+              <h2>3. Cargar preguntas</h2>
+              <p>La app acepta archivos CSV, XLSX o XLS. Lee la primera hoja y valida cada fila.</p>
+            </div>
+            <span class="tag">CSV/XLSX</span>
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <h3>Pasos de carga</h3>
+              <ol class="steps">
+                <li><span>1</span><div>En <strong>Preguntas</strong>, presiona <strong>Cargar CSV/XLSX</strong>.</div></li>
+                <li><span>2</span><div>Selecciona el archivo de preguntas.</div></li>
+                <li><span>3</span><div>Confirma que aparezca el numero de preguntas cargadas.</div></li>
+                <li><span>4</span><div>Si aparecen errores, corrige la fila indicada y vuelve a importar.</div></li>
+              </ol>
+            </div>
+            <div>
+              <h3>Reglas importantes</h3>
+              <div class="warning">Cada pregunta debe tener minimo 6 respuestas y maximo 8 respuestas.</div>
+              <p>Las respuestas vacias no se cuentan. El boton <strong>Iniciar</strong> se habilita solo si todas las preguntas son validas.</p>
+              <p>El boton <strong>Datos mock</strong> sirve para ensayos o pruebas tecnicas, no para la partida real.</p>
+            </div>
+          </div>
+
+          <h3>Columnas requeridas</h3>
+          <table>
+            <tr><th>Columna</th><th>Obligatoria</th><th>Descripcion</th></tr>
+            <tr><td><code>round</code></td><td>Si</td><td>Numero de ronda.</td></tr>
+            <tr><td><code>question</code></td><td>Si</td><td>Texto de la pregunta.</td></tr>
+            <tr><td><code>answer_1</code> a <code>answer_6</code></td><td>Si</td><td>Primeras seis respuestas.</td></tr>
+            <tr><td><code>answer_7</code> y <code>answer_8</code></td><td>No</td><td>Respuestas adicionales si aplica.</td></tr>
+          </table>
+        </section>
+
+        <section id="inicio">
+          <div class="section-head">
+            <div>
+              <h2>4. Iniciar partida</h2>
+              <p>Cuando el modo, equipos y preguntas esten listos, inicia la secuencia visual.</p>
+            </div>
+            <span class="tag">Arranque</span>
+          </div>
+
+          <div class="flow">
+            <div class="flow-card"><strong>1. Iniciar</strong><span>Presiona Iniciar en Partida.</span></div>
+            <div class="flow-card"><strong>2. Intro</strong><span>La pantalla publica muestra introduccion.</span></div>
+            <div class="flow-card"><strong>3. Ronda</strong><span>Avanza al intro de ronda.</span></div>
+            <div class="flow-card"><strong>4. Pregunta</strong><span>Selecciona o confirma la pregunta.</span></div>
+            <div class="flow-card"><strong>5. Tablero</strong><span>Opera respuestas, errores y bolsa.</span></div>
+          </div>
+        </section>
+
+        <section id="operacion">
+          <div class="section-head">
+            <div>
+              <h2>5. Operacion en vivo</h2>
+              <p>Estas son las acciones mas usadas durante una ronda.</p>
+            </div>
+            <span class="tag">En vivo</span>
+          </div>
+
+          <div class="grid-3">
+            <div class="note">
+              <strong>Escenas</strong><br />
+              Usa Siguiente escena para avanzar. Escena anterior regresa a la escena previa disponible.
+            </div>
+            <div class="tip">
+              <strong>Respuestas</strong><br />
+              En Revelar, haz clic en una respuesta. Sus puntos se suman a la bolsa.
+            </div>
+            <div class="warning">
+              <strong>Errores</strong><br />
+              Error A y Error B suman error y muestran X. Mostrar X solo es visual.
+            </div>
+          </div>
+
+          <h3>Robo</h3>
+          <ol class="steps">
+            <li><span>1</span><div>Presiona <strong>Anunciar robo</strong> para mostrar el aviso visual.</div></li>
+            <li><span>2</span><div>Opera la respuesta o el resultado segun la dinamica del evento.</div></li>
+            <li><span>3</span><div>Si el equipo gana la bolsa, presiona <strong>Gana Equipo A</strong> o <strong>Gana Equipo B</strong>.</div></li>
+          </ol>
+        </section>
+
+        <section id="ronda">
+          <div class="section-head">
+            <div>
+              <h2>6. Cerrar ronda y finalizar</h2>
+              <p>La bolsa se asigna solo cuando el operador declara ganador de ronda.</p>
+            </div>
+            <span class="tag">Puntos</span>
+          </div>
+
+          <ol class="steps">
+            <li><span>1</span><div>Confirma que la <strong>Bolsa</strong> tenga los puntos correctos.</div></li>
+            <li><span>2</span><div>Presiona <strong>Gana Equipo A</strong> o <strong>Gana Equipo B</strong>.</div></li>
+            <li><span>3</span><div>En resultado de ronda, prepara la pregunta de la siguiente ronda si aparece el panel <strong>Preguntas ronda X</strong>.</div></li>
+            <li><span>4</span><div>Presiona <strong>Siguiente escena</strong> para continuar.</div></li>
+            <li><span>5</span><div>Al terminar la partida, presiona <strong>Finalizar</strong>. Usa <strong>Reset</strong> solo cuando ya no necesites conservar el estado.</div></li>
+          </ol>
+        </section>
+
+        <section id="atajos">
+          <div class="section-head">
+            <div>
+              <h2>7. Atajos de teclado</h2>
+              <p>Funcionan mientras el cursor no este dentro de un campo de texto o selector.</p>
+            </div>
+            <span class="tag">Rapido</span>
+          </div>
+
+          <div class="kbd-grid">
+            <div class="kbd-card"><kbd>Espacio</kbd><span>Siguiente escena</span></div>
+            <div class="kbd-card"><kbd>Backspace</kbd><span>Escena anterior</span></div>
+            <div class="kbd-card"><kbd>1-8</kbd><span>Revelar respuesta por numero</span></div>
+            <div class="kbd-card"><kbd>Q</kbd><span>Error del Equipo A</span></div>
+            <div class="kbd-card"><kbd>P</kbd><span>Error del Equipo B</span></div>
+            <div class="kbd-card"><kbd>R</kbd><span>Anunciar robo</span></div>
+          </div>
+        </section>
+
+        <section id="problemas">
+          <div class="section-head">
+            <div>
+              <h2>8. Problemas comunes</h2>
+              <p>Diagnosticos rapidos para los casos que pueden aparecer durante ensayo o evento.</p>
+            </div>
+            <span class="tag">Soporte</span>
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <h3>Iniciar esta deshabilitado</h3>
+              <ul>
+                <li>No hay preguntas cargadas.</li>
+                <li>Alguna pregunta tiene menos de 6 o mas de 8 respuestas.</li>
+                <li>El archivo tiene errores de importacion.</li>
+              </ul>
+
+              <h3>No aparece una pregunta</h3>
+              <p>Confirma que el archivo tenga preguntas con el numero de ronda correcto.</p>
+            </div>
+            <div>
+              <h3>Pantalla publica no cambia</h3>
+              <ul>
+                <li>Revisa el panel <strong>Preview actual</strong>.</li>
+                <li>Presiona <strong>Siguiente escena</strong> una vez mas.</li>
+                <li>Si persiste, reinicia la app y vuelve a cargar preguntas.</li>
+              </ul>
+
+              <h3>Puntos al equipo equivocado</h3>
+              <p>Presiona el boton <strong>Gana</strong> del equipo correcto. La app corrige la asignacion de la ronda.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="checklist">
+          <div class="section-head">
+            <div>
+              <h2>9. Checklist del operador</h2>
+              <p>Lista corta para tener a la mano en cabina o mesa de control.</p>
+            </div>
+            <span class="tag">Resumen</span>
+          </div>
+
+          <div class="grid-3">
+            <div>
+              <h3>Antes de abrir puertas</h3>
+              <ul class="checks">
+                <li><span>1</span><div>Pantalla publica en el monitor correcto.</div></li>
+                <li><span>2</span><div>Modo de juego seleccionado.</div></li>
+                <li><span>3</span><div>Equipos y preguntas cargados.</div></li>
+              </ul>
+            </div>
+            <div>
+              <h3>Durante la partida</h3>
+              <ul class="checks">
+                <li><span>1</span><div>Confirmar pregunta antes de mostrarla.</div></li>
+                <li><span>2</span><div>Revelar respuestas por numero.</div></li>
+                <li><span>3</span><div>Verificar bolsa antes de asignar ganador.</div></li>
+              </ul>
+            </div>
+            <div>
+              <h3>Al final</h3>
+              <ul class="checks">
+                <li><span>1</span><div>Presionar Finalizar.</div></li>
+                <li><span>2</span><div>Confirmar ganador en pantalla publica.</div></li>
+                <li><span>3</span><div>Reset solo al cerrar la partida.</div></li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
