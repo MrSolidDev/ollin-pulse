@@ -8,6 +8,7 @@
     "dev": "vite --host 127.0.0.1",
     "electron:dev": "npm run build && concurrently -k \"vite --host 127.0.0.1\" \"wait-on tcp:5173 && powershell -NoProfile -ExecutionPolicy Bypass -Command \\\"Remove-Item Env:ELECTRON_RUN_AS_NODE -ErrorAction SilentlyContinue; $env:VITE_DEV_SERVER_URL='http://127.0.0.1:5173'; .\\\\node_modules\\\\.bin\\\\electron.cmd .\\\"\"",
     "build": "vue-tsc --noEmit && vite build && tsc -p electron/tsconfig.json",
+    "mockups": "playwright test",
     "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {
@@ -19,6 +20,7 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@types/node": "^22.15.21",
     "autoprefixer": "^10.4.21",
     "concurrently": "^9.1.2",
