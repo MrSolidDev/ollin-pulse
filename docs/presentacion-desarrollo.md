@@ -108,7 +108,7 @@ Las preguntas se cargan desde archivos CSV, XLSX o XLS. Cada fila representa una
 
 - Numero de ronda.
 - Texto de pregunta.
-- Entre 6 y 8 respuestas.
+- Entre 2 y 8 respuestas.
 
 La aplicacion asigna puntos automaticamente por posicion de respuesta y por multiplicador de ronda. Esto evita depender de calculos manuales durante el evento.
 
@@ -179,7 +179,7 @@ El desarrollo actual cubre:
 
 - Dos ventanas sincronizadas: operador y pantalla publica.
 - Importacion de preguntas CSV/XLSX/XLS.
-- Validacion de preguntas con 6 a 8 respuestas.
+- Validacion de preguntas con 2 a 8 respuestas.
 - Modos de 3 rondas, 5 rondas y muerte subita.
 - Calculo automatico de puntos por multiplicador.
 - Revelado de respuestas.

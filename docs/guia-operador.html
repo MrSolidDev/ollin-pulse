@@ -819,7 +819,7 @@
             </div>
             <div>
               <h3>Reglas importantes</h3>
-              <div class="warning">Cada pregunta debe tener minimo 6 respuestas y maximo 8 respuestas.</div>
+              <div class="warning">Cada pregunta debe tener minimo 2 respuestas y maximo 8 respuestas.</div>
               <p>Las respuestas vacias no se cuentan. El boton <strong>Iniciar</strong> se habilita solo si todas las preguntas son validas.</p>
               <p>El boton <strong>Datos mock</strong> sirve para ensayos o pruebas tecnicas, no para la partida real.</p>
             </div>
@@ -830,8 +830,8 @@
             <tr><th>Columna</th><th>Obligatoria</th><th>Descripcion</th></tr>
             <tr><td><code>round</code></td><td>Si</td><td>Numero de ronda.</td></tr>
             <tr><td><code>question</code></td><td>Si</td><td>Texto de la pregunta.</td></tr>
-            <tr><td><code>answer_1</code> a <code>answer_6</code></td><td>Si</td><td>Primeras seis respuestas.</td></tr>
-            <tr><td><code>answer_7</code> y <code>answer_8</code></td><td>No</td><td>Respuestas adicionales si aplica.</td></tr>
+            <tr><td><code>answer_1</code> y <code>answer_2</code></td><td>Si</td><td>Primeras dos respuestas.</td></tr>
+            <tr><td><code>answer_3</code> a <code>answer_8</code></td><td>No</td><td>Respuestas adicionales si aplica.</td></tr>
           </table>
         </section>
 
@@ -936,7 +936,7 @@
               <h3>Iniciar esta deshabilitado</h3>
               <ul>
                 <li>No hay preguntas cargadas.</li>
-                <li>Alguna pregunta tiene menos de 6 o mas de 8 respuestas.</li>
+                <li>Alguna pregunta tiene menos de 2 o mas de 8 respuestas.</li>
                 <li>El archivo tiene errores de importacion.</li>
               </ul>
 

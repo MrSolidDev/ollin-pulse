@@ -34,9 +34,11 @@ const selectedQuestionId = computed({
   }
 });
 
-const canStart = computed(() => game.questions.length > 0 && game.questions.every((question) => question.answers.length >= 6 && question.answers.length <= 8));
+const canStart = computed(() => game.questions.length > 0 && game.questions.every((question) => question.answers.length >= 2 && question.answers.length <= 8));
 const hasNextRound = computed(() => game.currentRound < game.rounds.length);
 const isChoosingNextRoundQuestion = computed(() => scenes.active.type === "ROUND_RESULT" && hasNextRound.value);
+const isScoreboardOverlayActive = computed(() => scenes.overlay?.type === "SCOREBOARD");
+const isFinalScene = computed(() => scenes.active.type === "FINAL_WINNER");
 const questionListRound = computed(() => (isChoosingNextRoundQuestion.value ? game.currentRound + 1 : game.currentRound));
 const visibleQuestions = computed(() => game.questions.filter((question) => question.round === questionListRound.value));
 const questionListTitle = computed(() => (isChoosingNextRoundQuestion.value ? `Preguntas ronda ${questionListRound.value}` : "Preview siguiente"));
@@ -78,10 +80,6 @@ async function startGame() {
   }
 }
 
-async function quickScene(type: "SCOREBOARD" | "STEAL") {
-  await scenes.setScene(type, { teams: game.teams });
-}
-
 async function showVisualStrike() {
   try {
     await scenes.flashStrike();
@@ -100,7 +98,20 @@ async function announceSteal() {
   }
 }
 
+async function toggleScoreboard() {
+  try {
+    await scenes.toggleScoreboard();
+    statusMessage.value = isScoreboardOverlayActive.value ? "Marcador visible" : "Marcador oculto";
+  } catch (error) {
+    statusMessage.value = error instanceof Error ? error.message : "No se pudo alternar marcador";
+  }
+}
+
 async function nextScene() {
+  if (isFinalScene.value) {
+    statusMessage.value = "Juego finalizado. Reinicia para cambiar de escena";
+    return;
+  }
   try {
     const before = scenes.active.type;
     await scenes.advanceScene();
@@ -111,6 +122,10 @@ async function nextScene() {
 }
 
 async function previousScene() {
+  if (isFinalScene.value) {
+    statusMessage.value = "Juego finalizado. Reinicia para cambiar de escena";
+    return;
+  }
   try {
     await scenes.previousScene();
     statusMessage.value = `Escena: ${scenes.active.type}`;
@@ -143,9 +158,11 @@ function handleKeydown(event: KeyboardEvent) {
 
   if (event.code === "Space") {
     event.preventDefault();
+    if (isFinalScene.value) return;
     void nextScene();
   } else if (event.code === "Backspace") {
     event.preventDefault();
+    if (isFinalScene.value) return;
     void previousScene();
   } else if (/^[1-8]$/.test(event.key)) {
     reveal(Number(event.key) - 1);
@@ -179,8 +196,8 @@ onBeforeUnmount(() => {
 
 <template>
   <main class="operator-shell">
-    <aside class="field-grid">
-      <section class="control-panel">
+    <aside class="field-grid operator-sidebar operator-sidebar-left">
+      <section class="control-panel game-panel">
         <header class="panel-header">
           <h2>Partida</h2>
           <span>{{ statusMessage }}</span>
@@ -200,7 +217,7 @@ onBeforeUnmount(() => {
         </div>
       </section>
 
-      <section class="control-panel field-grid">
+      <section class="control-panel field-grid teams-panel">
         <header class="panel-header">
           <h2>Equipos</h2>
           <span>En vivo</span>
@@ -216,16 +233,16 @@ onBeforeUnmount(() => {
         <button class="primary-button" @click="saveTeams">Guardar nombres</button>
       </section>
 
-      <section class="control-panel">
+      <section class="control-panel quick-controls-panel">
         <header class="panel-header">
           <h2>Controles rápidos</h2>
           <span>{{ game.phase }}</span>
         </header>
         <div class="button-grid">
-          <button class="ghost-button" @click="previousScene">Escena anterior</button>
-          <button class="primary-button" @click="nextScene">Siguiente escena</button>
+          <button class="ghost-button" :disabled="isFinalScene" @click="previousScene">Escena anterior</button>
+          <button class="primary-button" :disabled="isFinalScene" @click="nextScene">Siguiente escena</button>
           <button class="ghost-button" @click="announceSteal">Anunciar robo</button>
-          <button class="ghost-button" @click="quickScene('SCOREBOARD')">Marcador</button>
+          <button class="ghost-button" @click="toggleScoreboard">{{ isScoreboardOverlayActive ? "Ocultar marcador" : "Marcador" }}</button>
           <button class="ghost-button danger-button" @click="showVisualStrike">Mostrar X</button>
           <button class="ghost-button danger-button" @click="addError('A')">Error A</button>
           <button class="ghost-button danger-button" @click="addError('B')">Error B</button>
@@ -236,8 +253,8 @@ onBeforeUnmount(() => {
       <TimelinePanel :scene="scenes" />
     </aside>
 
-    <section class="preview-stack">
-      <div class="preview-panel">
+    <section class="preview-stack operator-preview-stack">
+      <div class="preview-panel live-preview-panel">
         <header class="panel-header">
           <h2>Preview actual</h2>
           <span>{{ scenes.active.type }}</span>
@@ -249,7 +266,7 @@ onBeforeUnmount(() => {
         </div>
       </div>
 
-      <div class="preview-panel">
+      <div class="preview-panel next-question-panel">
         <header class="panel-header">
           <h2>{{ questionListTitle }}</h2>
           <span>{{ isChoosingNextRoundQuestion ? "Preparar" : scenes.next?.type ?? "Sin cola" }}</span>
@@ -263,8 +280,8 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
-    <aside class="field-grid">
-      <section class="control-panel">
+    <aside class="field-grid operator-sidebar operator-sidebar-right">
+      <section class="control-panel import-panel">
         <header class="panel-header">
           <h2>Preguntas</h2>
           <span>{{ game.questions.length }}</span>
@@ -278,7 +295,7 @@ onBeforeUnmount(() => {
         </div>
       </section>
 
-      <section class="control-panel">
+      <section class="control-panel reveal-panel">
         <header class="panel-header">
           <h2>Revelar</h2>
           <span>{{ game.currentQuestion?.answers.length ?? 0 }}</span>
@@ -302,7 +319,7 @@ onBeforeUnmount(() => {
         </div>
       </section>
 
-      <section class="control-panel">
+      <section class="control-panel status-panel">
         <header class="panel-header">
           <h2>Estado</h2>
           <span>R{{ game.currentRound }}</span>

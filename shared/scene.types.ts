@@ -25,7 +25,7 @@ export interface Scene<TPayload = Record<string, unknown>> {
 
 export interface SceneOverlay {
   id: string;
-  type: "STRIKE" | "STEAL";
+  type: "STRIKE" | "STEAL" | "SCOREBOARD";
   payload: Record<string, unknown>;
   durationMs: number;
 }

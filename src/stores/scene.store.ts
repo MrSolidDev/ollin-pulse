@@ -46,6 +46,10 @@ export const useSceneStore = defineStore("scene", {
     async flashStrike() {
       const snapshot = await window.ollinPulse.invoke("scene:flashStrike", undefined);
       if (isAppSnapshot(snapshot)) this.hydrate(snapshot.scene);
+    },
+    async toggleScoreboard() {
+      const snapshot = await window.ollinPulse.invoke("scene:toggleScoreboard", undefined);
+      if (isAppSnapshot(snapshot)) this.hydrate(snapshot.scene);
     }
   }
 });

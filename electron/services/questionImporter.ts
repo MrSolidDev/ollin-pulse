@@ -24,8 +24,8 @@ export function validateQuestionRows(rows: ImportedQuestionRow[]): QuestionValid
     }
 
     const answers = extractAnswers(row);
-    if (answers.length < 6) {
-      errors.push({ row: rowNumber, field: "answers", message: "Cada pregunta debe tener al menos 6 respuestas." });
+    if (answers.length < 2) {
+      errors.push({ row: rowNumber, field: "answers", message: "Cada pregunta debe tener al menos 2 respuestas." });
     }
     if (answers.length > 8) {
       errors.push({ row: rowNumber, field: "answers", message: "Cada pregunta debe tener máximo 8 respuestas." });

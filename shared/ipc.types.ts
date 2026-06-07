@@ -26,6 +26,7 @@ export interface SceneCommands {
   "scene:previous": undefined;
   "scene:flashSteal": undefined;
   "scene:flashStrike": undefined;
+  "scene:toggleScoreboard": undefined;
 }
 
 export type IpcCommandMap = GameCommands & SceneCommands;

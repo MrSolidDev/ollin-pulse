@@ -51,14 +51,14 @@ La app lee la primera hoja del archivo y espera estas columnas:
 | `question` | Si | Texto de la pregunta. |
 | `answer_1` | Si | Primera respuesta. |
 | `answer_2` | Si | Segunda respuesta. |
-| `answer_3` | Si | Tercera respuesta. |
-| `answer_4` | Si | Cuarta respuesta. |
-| `answer_5` | Si | Quinta respuesta. |
-| `answer_6` | Si | Sexta respuesta. |
+| `answer_3` | No | Tercera respuesta, si aplica. |
+| `answer_4` | No | Cuarta respuesta, si aplica. |
+| `answer_5` | No | Quinta respuesta, si aplica. |
+| `answer_6` | No | Sexta respuesta, si aplica. |
 | `answer_7` | No | Septima respuesta, si aplica. |
 | `answer_8` | No | Octava respuesta, si aplica. |
 
-Cada pregunta debe tener **minimo 6 respuestas y maximo 8 respuestas**. Las respuestas vacias no se cuentan.
+Cada pregunta debe tener **minimo 2 respuestas y maximo 8 respuestas**. Las respuestas vacias no se cuentan.
 
 Ejemplo:
 
@@ -78,7 +78,7 @@ El boton **Datos mock** carga preguntas de prueba. Usalo solo para ensayos, prue
 3. La pantalla publica mostrara la introduccion.
 4. Usa **Siguiente escena** para avanzar al intro de ronda y despues al tablero de pregunta.
 
-El boton **Iniciar** solo se habilita cuando hay preguntas cargadas y todas tienen entre 6 y 8 respuestas.
+El boton **Iniciar** solo se habilita cuando hay preguntas cargadas y todas tienen entre 2 y 8 respuestas.
 
 ## 4. Operacion durante la ronda
 
@@ -189,7 +189,7 @@ Estos atajos funcionan mientras el foco no este dentro de un campo de texto o se
 Revisa que:
 
 - Se hayan cargado preguntas.
-- Todas las preguntas tengan entre 6 y 8 respuestas.
+- Todas las preguntas tengan entre 2 y 8 respuestas.
 - El archivo no tenga errores de importacion.
 
 ### La app muestra errores al importar
@@ -198,7 +198,7 @@ Revisa la fila indicada por el mensaje. Los problemas mas comunes son:
 
 - Falta el numero de ronda en `round`.
 - Falta el texto de `question`.
-- La pregunta tiene menos de 6 respuestas.
+- La pregunta tiene menos de 2 respuestas.
 - La pregunta tiene mas de 8 respuestas.
 - Los nombres de columnas no coinciden con el formato requerido.
 

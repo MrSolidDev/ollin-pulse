@@ -131,12 +131,12 @@ function snapshotFor(type: SceneType, role: "operator" | "public") {
     scene: {
       active,
       previous: scene("INTRO", "previous"),
-      next: scene("SCOREBOARD", "next"),
+      next: scene("QUESTION_BOARD", "next"),
       overlay:
         type === "STRIKE" || type === "STEAL"
           ? { id: `overlay-${type}`, type, payload: {}, durationMs: 900 }
           : undefined,
-      queue: [scene("QUESTION_BOARD", "queue-question"), scene("SCOREBOARD", "queue-scoreboard")],
+      queue: [scene("QUESTION_BOARD", "queue-question")],
       timeline: [scene("IDLE", "timeline-idle"), scene("INTRO", "timeline-intro"), active],
       updatedAt: now
     },
@@ -191,7 +191,7 @@ test.beforeAll(() => {
 test("operator view mockups", async ({ page }) => {
   await installOllinPulseMock(page, "QUESTION_BOARD", "operator");
 
-  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.setViewportSize({ width: 1366, height: 768 });
   await page.goto("/#/operator");
   await capture(page, "operator-desktop");
 

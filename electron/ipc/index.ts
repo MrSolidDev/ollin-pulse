@@ -133,8 +133,21 @@ export function registerIpc(params: { game: GameController; scenes: SceneManager
       case "scene:flashStrike":
         flashOverlay("STRIKE", { teams: game.getState().teams, visualOnly: true }, 900);
         break;
+      case "scene:toggleScoreboard": {
+        clearTransientScene();
+        if (scenes.getState().overlay?.type === "SCOREBOARD") {
+          scenes.clearOverlay();
+        } else {
+          const state = game.getState();
+          scenes.setOverlay("SCOREBOARD", { teams: state.teams, roundBank: state.roundBank }, 0);
+        }
+        break;
+      }
       case "scene:next":
         clearTransientScene();
+        if (scenes.getState().active.type === "FINAL_WINNER") {
+          break;
+        }
         if (scenes.getState().active.type === "ROUND_RESULT") {
           if (game.hasNextRound()) {
             const currentState = game.getState();
@@ -156,6 +169,9 @@ export function registerIpc(params: { game: GameController; scenes: SceneManager
         break;
       case "scene:previous":
         clearTransientScene();
+        if (scenes.getState().active.type === "FINAL_WINNER") {
+          break;
+        }
         scenes.previous();
         break;
       case "game:importQuestions": {

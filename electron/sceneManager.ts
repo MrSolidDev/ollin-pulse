@@ -60,7 +60,7 @@ export class SceneManager {
     return this.getState();
   }
 
-  setOverlay(type: "STRIKE" | "STEAL", payload: Record<string, unknown> = {}, durationMs = 1000): SceneState {
+  setOverlay(type: "STRIKE" | "STEAL" | "SCOREBOARD", payload: Record<string, unknown> = {}, durationMs = 1000): SceneState {
     this.state = {
       ...this.state,
       overlay: {
@@ -85,7 +85,7 @@ export class SceneManager {
 
   next(): SceneState {
     if (this.state.queue.length === 0) {
-      return this.setScene("SCOREBOARD");
+      return this.getState();
     }
 
     const [active, ...queue] = this.state.queue;
@@ -124,16 +124,10 @@ export class SceneManager {
       case "STEAL":
         return this.setScene("QUESTION_BOARD", { question, teams });
       case "QUESTION_BOARD":
-        return this.setScene("SCOREBOARD", { teams: game.teams, roundBank: game.roundBank });
+        return this.getState();
       case "SCOREBOARD":
-        return game.phase === "final_result"
-          ? this.setScene("FINAL_WINNER", { teams: game.teams, winnerTeamId: game.winnerTeamId })
-          : this.setScene("ROUND_INTRO", {
-              round: game.currentRound,
-              multiplier: game.rounds[game.currentRound - 1]?.multiplier
-            });
       case "ROUND_RESULT":
-        return this.setScene("SCOREBOARD", { teams: game.teams, roundBank: game.roundBank });
+        return this.getState();
       case "FINAL_WINNER":
       default:
         return this.getState();
@@ -160,8 +154,7 @@ export class SceneManager {
     const teamNames = game.teams.map((team) => team.name);
     return [
       createScene("ROUND_INTRO", { round: game.currentRound, multiplier: game.rounds[game.currentRound - 1]?.multiplier }),
-      createScene("QUESTION_BOARD", { question, teams: teamNames }),
-      createScene("SCOREBOARD", { teams: game.teams })
+      createScene("QUESTION_BOARD", { question, teams: teamNames })
     ];
   }
 }

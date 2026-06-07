@@ -1,6 +1,12 @@
 import type { GameMode, Question, ValidationResult } from "@shared/game.types";
 
-const presets: Record<6 | 7 | 8, number[]> = {
+type AnswerCount = 2 | 3 | 4 | 5 | 6 | 7 | 8;
+
+const presets: Record<AnswerCount, number[]> = {
+  2: [60, 40],
+  3: [50, 30, 20],
+  4: [40, 30, 20, 10],
+  5: [35, 25, 20, 12, 8],
   6: [35, 25, 15, 10, 8, 7],
   7: [32, 24, 16, 10, 8, 6, 4],
   8: [28, 22, 18, 12, 8, 6, 4, 2]
@@ -18,7 +24,7 @@ export function calculateAnswerPoints(params: {
   roundNumber: number;
   gameMode: GameMode;
 }): number {
-  const total = Math.min(Math.max(params.totalAnswers, 6), 8) as 6 | 7 | 8;
+  const total = Math.min(Math.max(params.totalAnswers, 2), 8) as AnswerCount;
   return presets[total][params.answerIndex] * getRoundMultiplier({ roundNumber: params.roundNumber, gameMode: params.gameMode });
 }
 
@@ -32,7 +38,7 @@ export function applyPointPresetToQuestion(question: Question, gameMode: GameMod
 
 export function validateQuestionForGameMode(question: Question): ValidationResult {
   const errors = [];
-  if (question.answers.length < 6) errors.push("Debe tener al menos 6 respuestas.");
+  if (question.answers.length < 2) errors.push("Debe tener al menos 2 respuestas.");
   if (question.answers.length > 8) errors.push("Debe tener máximo 8 respuestas.");
   return { valid: errors.length === 0, errors };
 }
