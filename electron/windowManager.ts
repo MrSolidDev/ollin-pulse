@@ -1,5 +1,4 @@
 import path from "node:path";
-import { pathToFileURL } from "node:url";
 import { app, BrowserWindow, screen } from "electron";
 
 export class WindowManager {
@@ -49,8 +48,8 @@ export class WindowManager {
       y: external?.bounds.y,
       title: "OLLIN Pulse - Pantalla Pública",
       backgroundColor: "#071018",
-      frame: false,
-      fullscreen: true,
+      frame: !external,
+      fullscreen: Boolean(external),
       autoHideMenuBar: true,
       webPreferences: {
         preload: path.join(__dirname, "preload.js"),
@@ -76,7 +75,7 @@ export class WindowManager {
   private resolveUrl(route: string): string {
     const devServerUrl = process.env.VITE_DEV_SERVER_URL;
     if (devServerUrl) return `${devServerUrl}${route}`;
-    const rendererEntry = path.join(__dirname, "../../dist-renderer/index.html");
-    return `${pathToFileURL(rendererEntry).toString()}${route}`;
+    const fileRoute = route.startsWith("/#") ? route.slice(1) : route;
+    return `ollin://app/index.html${fileRoute}`;
   }
 }

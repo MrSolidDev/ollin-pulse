@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch } from "vue";
+import { computed, onMounted, watch } from "vue";
 import type { GameState } from "@shared/game.types";
 import type { SceneState } from "@shared/scene.types";
 
@@ -53,6 +53,13 @@ const questionSizeClass = computed(() => {
   if (length > 54) return "question-text-md";
   return "question-text-lg";
 });
+function answerSizeClass(text: string) {
+  const length = text.length;
+  if (length > 64) return "answer-text-xs";
+  if (length > 48) return "answer-text-sm";
+  if (length > 32) return "answer-text-md";
+  return "answer-text-lg";
+}
 const activeSceneType = computed(() => props.scene.active.type);
 const activeSceneId = computed(() => props.scene.active.id);
 const overlayId = computed(() => props.scene.overlay?.id);
@@ -80,19 +87,59 @@ function errorLabel(count: number) {
 
 const isPublicWindow = () => window.ollinPulse?.getWindowRole?.() === "public";
 
-const audioCache = new Map<string, HTMLAudioElement>();
+let audioContext: AudioContext | undefined;
+const audioBufferCache = new Map<string, Promise<AudioBuffer>>();
+const soundSources = Object.values(sounds);
 
-function playSound(src: string) {
+function getAudioContext() {
+  audioContext ??= new AudioContext();
+  return audioContext;
+}
+
+function loadAudioBuffer(src: string) {
+  const cached = audioBufferCache.get(src);
+  if (cached) return cached;
+
+  const promise = fetch(src)
+    .then((response) => {
+      if (!response.ok) throw new Error(`No se pudo cargar audio: ${response.status}`);
+      return response.arrayBuffer();
+    })
+    .then((buffer) => getAudioContext().decodeAudioData(buffer));
+
+  audioBufferCache.set(src, promise);
+  return promise;
+}
+
+async function playSound(src: string) {
   if (!isPublicWindow()) return;
 
-  const audio = audioCache.get(src) ?? new Audio(src);
-  audioCache.set(src, audio);
-  audio.pause();
-  audio.currentTime = 0;
-  void audio.play().catch(() => {
-    // Electron/browser autoplay policies can reject sound until the window has focus.
-  });
+  try {
+    const context = getAudioContext();
+    if (context.state === "suspended") await context.resume();
+
+    const buffer = await loadAudioBuffer(src);
+    const source = context.createBufferSource();
+    source.buffer = buffer;
+    source.connect(context.destination);
+    source.start();
+  } catch (error) {
+    const audio = new Audio(src);
+    audio.preload = "auto";
+    void audio.play().catch((fallbackError) => {
+      console.warn("No se pudo reproducir audio", { src, error, fallbackError });
+    });
+  }
 }
+
+onMounted(() => {
+  if (!isPublicWindow()) return;
+  soundSources.forEach((src) => {
+    void loadAudioBuffer(src).catch((error) => {
+      console.warn("No se pudo precargar audio", { src, error });
+    });
+  });
+});
 
 watch(activeSceneId, () => {
   switch (activeSceneType.value) {
@@ -130,7 +177,11 @@ watch(overlayId, () => {
 <template>
   <main
     class="public-stage public-branded-stage"
-    :class="[`scene-${activeSceneType.toLowerCase().replace('_', '-')}`, { 'few-answers': answerCount > 0 && answerCount < 6, 'many-answers': answerCount > 6 }]"
+    :class="[
+      `scene-${activeSceneType.toLowerCase().replace('_', '-')}`,
+      `answers-${answerCount}`,
+      { 'few-answers': answerCount > 0 && answerCount < 6, 'many-answers': answerCount > 6 }
+    ]"
     :style="stageBackground"
   >
     <img class="drinkiq-brand" :src="assets.drinkiqLogo" alt="" aria-hidden="true" />
@@ -213,7 +264,12 @@ watch(overlayId, () => {
       <div class="question-panel">
         <p class="question-text" :class="questionSizeClass">{{ questionText }}</p>
         <div class="answers-grid">
-          <div v-for="(answer, index) in currentQuestion?.answers" :key="answer.id" class="answer-tile" :class="{ revealed: answer.revealed }">
+          <div
+            v-for="(answer, index) in currentQuestion?.answers"
+            :key="answer.id"
+            class="answer-tile"
+            :class="[{ revealed: answer.revealed }, answerSizeClass(answer.text)]"
+          >
             <span>{{ answer.revealed ? answer.text : index + 1 }}</span>
             <strong v-if="answer.revealed">{{ answer.points }}</strong>
           </div>
