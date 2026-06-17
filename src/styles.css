@@ -480,6 +480,8 @@ button {
 }
 
 .scoreboard-showcase {
+  width: min(100%, 1580px);
+  margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(28px, 4vw, 70px);
@@ -853,6 +855,48 @@ button {
 }
 
 @media (max-height: 900px) {
+  .scoreboard-scene {
+    gap: clamp(10px, 1.8vw, 24px);
+    padding: clamp(110px, 15vh, 132px) clamp(70px, 8vw, 116px) clamp(70px, 8vw, 104px);
+  }
+
+  .scoreboard-scene .top-logo {
+    top: clamp(18px, 3vh, 28px);
+    width: min(17vw, 230px);
+  }
+
+  .scoreboard-scene .eyebrow {
+    font-size: clamp(24px, 4.5vh, 38px);
+  }
+
+  .scoreboard-showcase {
+    width: min(100%, 1080px);
+    align-self: center;
+    gap: clamp(18px, 3vw, 36px);
+  }
+
+  .scoreboard-showcase article {
+    min-height: clamp(170px, 19vw, 230px);
+    border-radius: 22px;
+    padding: clamp(14px, 2.2vw, 28px);
+  }
+
+  .scoreboard-showcase span {
+    font-size: clamp(24px, 3vw, 38px);
+  }
+
+  .scoreboard-showcase strong {
+    min-width: min(25vw, 300px);
+    font-size: clamp(54px, 8.5vw, 104px);
+    padding: clamp(8px, 1.2vw, 14px) clamp(18px, 2.6vw, 34px);
+    border-radius: 20px;
+  }
+
+  .scoreboard-showcase small,
+  .scoreboard-bank span {
+    font-size: clamp(15px, 1.65vw, 22px);
+  }
+
   .board-scene {
     --board-logo-width: min(15vw, 230px);
     --board-logo-bottom: clamp(5px, 1vh, 9px);
