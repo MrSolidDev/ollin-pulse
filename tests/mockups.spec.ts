@@ -351,12 +351,123 @@ test("answer reveal fits the longest real question bank entry on compact display
   await installStaticSnapshot(page, snapshot);
 
   for (const viewport of [
+    { width: 1920, height: 1080 },
     { width: 1280, height: 720 },
-    { width: 1366, height: 768 }
+    { width: 1366, height: 768 },
+    { width: 1080, height: 1920 }
   ]) {
     await page.setViewportSize(viewport);
     await page.goto("/#/public");
     await expectBoardLayoutToFit(page);
+    if (viewport.width === 1920) await capture(page, "public-13-answer-reveal-bank-longest-1920x1080");
     if (viewport.width === 1280) await capture(page, "public-11-answer-reveal-bank-longest");
+    if (viewport.width === 1080) await capture(page, "public-12-answer-reveal-bank-longest-1080x1920");
   }
+});
+
+test("start game and round intro sounds do not overlap or replay on scene refresh", async ({ page }) => {
+  const initialSnapshot = snapshotFor("INTRO", "public");
+
+  await page.addInitScript((snapshot) => {
+    let current = snapshot;
+    const sceneListeners = new Set<(state: unknown) => void>();
+    const startedSources: string[] = [];
+    let nowMs = 1_000;
+    const timers: Array<{ due: number; callback: () => void }> = [];
+    Date.now = () => nowMs;
+    window.setTimeout = ((callback: TimerHandler, delay?: number) => {
+      timers.push({ due: nowMs + Number(delay ?? 0), callback: callback as () => void });
+      return timers.length as unknown as number;
+    }) as typeof window.setTimeout;
+    window.clearTimeout = ((id?: number) => {
+      if (!id) return;
+      timers[id - 1] = { due: Number.POSITIVE_INFINITY, callback: () => undefined };
+    }) as typeof window.clearTimeout;
+
+    (window as any).__startedSources = startedSources;
+    (window as any).__advanceAudioClock = (ms: number) => {
+      nowMs += ms;
+      timers
+        .filter((timer) => timer.due <= nowMs)
+        .splice(0)
+        .forEach((timer) => {
+          timer.due = Number.POSITIVE_INFINITY;
+          timer.callback();
+        });
+    };
+    (window as any).__emitRoundIntroScene = (round: number, id: string) => {
+      current = {
+        ...current,
+        game: { ...current.game, currentRound: round },
+        scene: {
+          ...current.scene,
+          active: {
+            ...current.scene.active,
+            id,
+            type: "ROUND_INTRO",
+            payload: { round }
+          }
+        }
+      };
+      sceneListeners.forEach((listener) => listener(current.scene));
+    };
+
+    window.fetch = async () => ({ ok: true, arrayBuffer: async () => new ArrayBuffer(8) }) as Response;
+    (window as any).AudioContext = class {
+      state = "running";
+      async resume() {
+        this.state = "running";
+      }
+      async decodeAudioData(_buffer: ArrayBuffer) {
+        return { duration: 5.2 };
+      }
+      createBufferSource() {
+        const source = {
+          buffer: undefined as { duration?: number } | undefined,
+          connect: () => undefined,
+          start: () => {
+            startedSources.push(String(source.buffer?.duration ?? "unknown"));
+          }
+        };
+        return {
+          get buffer() {
+            return source.buffer;
+          },
+          set buffer(value) {
+            source.buffer = value;
+          },
+          connect: source.connect,
+          start: source.start
+        };
+      }
+      get destination() {
+        return {};
+      }
+    };
+
+    window.ollinPulse = {
+      getWindowRole: () => current.role,
+      getSnapshot: async () => current,
+      onGameStateUpdated: () => () => undefined,
+      onSceneStateUpdated: (callback: (state: unknown) => void) => {
+        sceneListeners.add(callback);
+        return () => sceneListeners.delete(callback);
+      },
+      invoke: async () => current
+    };
+  }, initialSnapshot);
+
+  await page.goto("/#/public");
+  await expect.poll(() => page.evaluate(() => (window as any).__startedSources.length)).toBe(1);
+
+  await page.evaluate(() => (window as any).__emitRoundIntroScene(2, "round-intro-after-start"));
+  await page.waitForTimeout(100);
+  await expect(page.evaluate(() => (window as any).__startedSources.length)).resolves.toBe(1);
+
+  await page.evaluate(() => (window as any).__advanceAudioClock(5_200));
+  await expect.poll(() => page.evaluate(() => (window as any).__startedSources.length)).toBe(2);
+
+  await page.evaluate(() => (window as any).__emitRoundIntroScene(2, "round-intro-refreshed-same-round"));
+  await page.waitForTimeout(100);
+  await expect(page.evaluate(() => (window as any).__startedSources.length)).resolves.toBe(2);
 });

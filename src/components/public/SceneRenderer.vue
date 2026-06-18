@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import type { GameState } from "@shared/game.types";
 import type { SceneState } from "@shared/scene.types";
 
@@ -24,11 +24,13 @@ const assets = {
 };
 
 const sounds = {
+  startGame: assetUrl("sounds/start-game.mp3"),
   roundIntro: assetUrl("sounds/round-intro.mp3"),
   answerReveal: assetUrl("sounds/answer-reveal.mp3"),
   strike: assetUrl("sounds/strike.mp3"),
   steal: assetUrl("sounds/steal-points.mp3"),
-  win: assetUrl("sounds/win.mp3")
+  win: assetUrl("sounds/win.mp3"),
+  winnerCelebration: assetUrl("sounds/winer-celebration.mp3")
 };
 
 const props = defineProps<{
@@ -64,6 +66,12 @@ const activeSceneType = computed(() => props.scene.active.type);
 const activeSceneId = computed(() => props.scene.active.id);
 const overlayId = computed(() => props.scene.overlay?.id);
 const isBoardScene = computed(() => ["QUESTION_BOARD", "ANSWER_REVEAL", "STRIKE", "STEAL"].includes(activeSceneType.value));
+const lastRoundIntroSoundKey = ref<string | undefined>();
+const lastStartGameSoundKey = ref<string | undefined>();
+const startGameSoundFallbackMs = 5200;
+let startGameSoundUntil = 0;
+let pendingRoundIntroTimer: ReturnType<typeof setTimeout> | undefined;
+let pendingRoundIntroKey: string | undefined;
 const stageBackground = computed(() => {
   const map = {
     IDLE: assets.idleBg,
@@ -83,6 +91,22 @@ const stageBackground = computed(() => {
 
 function errorLabel(count: number) {
   return `${count} ${count === 1 ? "ERROR" : "ERRORES"}`;
+}
+
+function getRoundIntroSoundKey() {
+  const round = props.scene.active.payload.round;
+  return String(typeof round === "number" || typeof round === "string" ? round : props.game.currentRound);
+}
+
+function getStartGameSoundKey() {
+  return props.game.startedAt ?? props.scene.active.id;
+}
+
+function clearPendingRoundIntro() {
+  if (!pendingRoundIntroTimer) return;
+  clearTimeout(pendingRoundIntroTimer);
+  pendingRoundIntroTimer = undefined;
+  pendingRoundIntroKey = undefined;
 }
 
 const isPublicWindow = () => window.ollinPulse?.getWindowRole?.() === "public";
@@ -111,8 +135,8 @@ function loadAudioBuffer(src: string) {
   return promise;
 }
 
-async function playSound(src: string) {
-  if (!isPublicWindow()) return;
+async function playSound(src: string): Promise<number> {
+  if (!isPublicWindow()) return 0;
 
   try {
     const context = getAudioContext();
@@ -123,13 +147,37 @@ async function playSound(src: string) {
     source.buffer = buffer;
     source.connect(context.destination);
     source.start();
+    return buffer.duration * 1000;
   } catch (error) {
     const audio = new Audio(src);
     audio.preload = "auto";
     void audio.play().catch((fallbackError) => {
       console.warn("No se pudo reproducir audio", { src, error, fallbackError });
     });
+    return 0;
   }
+}
+
+async function playStartGameSound() {
+  startGameSoundUntil = Date.now() + startGameSoundFallbackMs;
+  const durationMs = await playSound(sounds.startGame);
+  if (durationMs > 0) {
+    startGameSoundUntil = Date.now() + durationMs;
+    if (pendingRoundIntroKey && activeSceneType.value === "ROUND_INTRO") playRoundIntroSoundWhenReady(pendingRoundIntroKey);
+  }
+}
+
+function playRoundIntroSoundWhenReady(roundKey: string) {
+  clearPendingRoundIntro();
+  pendingRoundIntroKey = roundKey;
+  const waitMs = Math.max(0, startGameSoundUntil - Date.now());
+
+  pendingRoundIntroTimer = setTimeout(() => {
+    pendingRoundIntroTimer = undefined;
+    pendingRoundIntroKey = undefined;
+    if (activeSceneType.value !== "ROUND_INTRO" || getRoundIntroSoundKey() !== roundKey) return;
+    void playSound(sounds.roundIntro);
+  }, waitMs);
 }
 
 onMounted(() => {
@@ -143,8 +191,25 @@ onMounted(() => {
 
 watch(activeSceneId, () => {
   switch (activeSceneType.value) {
+    case "IDLE":
+      lastRoundIntroSoundKey.value = undefined;
+      lastStartGameSoundKey.value = undefined;
+      clearPendingRoundIntro();
+      break;
+    case "INTRO":
+      lastRoundIntroSoundKey.value = undefined;
+      clearPendingRoundIntro();
+      if (lastStartGameSoundKey.value !== getStartGameSoundKey()) {
+        lastStartGameSoundKey.value = getStartGameSoundKey();
+        void playStartGameSound();
+      }
+      break;
     case "ROUND_INTRO":
-      playSound(sounds.roundIntro);
+      if (lastRoundIntroSoundKey.value !== getRoundIntroSoundKey()) {
+        const roundKey = getRoundIntroSoundKey();
+        lastRoundIntroSoundKey.value = roundKey;
+        playRoundIntroSoundWhenReady(roundKey);
+      }
       break;
     case "ANSWER_REVEAL":
       playSound(sounds.answerReveal);
@@ -156,8 +221,10 @@ watch(activeSceneId, () => {
       playSound(sounds.steal);
       break;
     case "ROUND_RESULT":
-    case "FINAL_WINNER":
       playSound(sounds.win);
+      break;
+    case "FINAL_WINNER":
+      playSound(sounds.winnerCelebration);
       break;
   }
 });
